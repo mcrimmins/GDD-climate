@@ -71,8 +71,13 @@ meanDOY450T0 <- mask(meanDOY450T0, maskNA_0)
 #   geom_point(data = point, aes(x = x, y = y), color = 'red', size = 3)
 
 # points
-x<-c(-81.322725, -87.199672, -92.672159)
-y<-c(27.011566, 36.178183, 41.947674)
+# 35.983498, -89.127785  
+x<-c(-89.127785, -88.006413)
+y<-c(35.983498,  41.281065)
+#x<-c(-81.322725, -87.199672, -92.672159)
+#y<-c(27.011566, 36.178183, 41.947674)
+# x<-c(-81.322725, -87.199672, -92.672159, -112.072393, -115.130783, -110.709217)
+# y<-c(27.011566, 36.178183, 41.947674, 32.314482, 41.470576, 44.710696)
 point<-data.frame(y,x)
 
 for(j in 1:nrow(point)){
@@ -108,6 +113,12 @@ colnames(gddTS)<-c("years","gdd50T0","gdd450T0","gdd50T10","gdd450T10")
   gddTS<-melt(gddTS,measure.vars = c("gdd50T0","gdd450T0","gdd50T10","gdd450T10"))
   gddTS<-separate(gddTS,variable,c("thresh","base"), sep ="T")
   gddTS$point<-j
+  gddTS<-melt(gddTS, measure.vars=c("zProdT0", "zProdT10"))
+  colnames(gddTS)[7]<-"zValue"
+  # thin out df
+  gddTS <- gddTS[-which(gddTS$base=='0' & gddTS$variable=='zProdT10'), ]
+  gddTS <- gddTS[-which(gddTS$base=='10' & gddTS$variable=='zProdT0'), ]
+  
 
     # combine frames
     if (j==1){
@@ -131,15 +142,20 @@ colnames(gddTS)<-c("years","gdd50T0","gdd450T0","gdd50T10","gdd450T10")
     meansall$mean450<-as.numeric(as.character(meansall$mean450))
 }
 
-ggplot(gddTSall, aes(value,as.factor(years), color=zProdT10)) + 
-  geom_line(size = 1)+
+ggplot(gddTSall, aes(value,as.factor(years), color=zValue)) + 
+  geom_line(size = 0.75)+
   geom_vline(aes(xintercept=mean50), data=meansall) +
   geom_vline(aes(xintercept=mean450), data=meansall) +
-  facet_wrap(base~point)+
+  facet_wrap(point~base, ncol = 2)+
   scale_y_discrete(breaks=c("1950","1960","1970","1980","1990","2000","2010"),
                    labels=c("1950","1960","1970","1980","1990","2000","2010"))+
   scale_color_gradient2(low = "orange", mid="grey94", high = "green", limits=c(-1,1), oob=squish)
 
+# make map
+map<-get_map(location = "USA", 
+             zoom = 4, source = "google", maptype = "terrain") %>% ggmap() +
+  #geom_point(data = point, aes(x = x, y = y, label=seq(1,j,1)), color = 'red', size = 3)
+  geom_label(data = point, aes(x = x, y = y, label=seq(1,j,1)))
 
 p<-ggplot(gddTS, aes(value,as.factor(years), color=zProdT10)) + 
    geom_line(size = 1)+

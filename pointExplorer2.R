@@ -59,7 +59,7 @@ point<-click(corRaster[[1]], n=1, xy=TRUE, show=FALSE, type="p")
 
 # make map
 map<-get_map(location = c(lon = point$x, lat = point$y), 
-             zoom = 5, source = "google", maptype = "terrain") %>% ggmap() +
+             zoom = 3, source = "google", maptype = "terrain") %>% ggmap() +
   geom_point(data = point, aes(x = x, y = y), color = 'red', size = 3)
 
 # get time series
