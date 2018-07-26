@@ -18,15 +18,15 @@ rasterOptions(progress = 'text')
 load("./fixed/bothBaseT/pearsonCorrBaseT10.RData")
 load("./fixed/bothBaseT/pearsonCorrBaseT0.RData")
 # plot all corrs in one stack
-# allCorr<-stack(corRasterDet_BaseT0[[1]], corRasterDet_BaseT10[[1]], 
-#                corRasterDet_BaseT0_250v50[[1]], corRasterDet_BaseT10_250v50[[1]],
-#                corRasterDet_BaseT0_250v50[[1]], corRasterDet_BaseT10_450v250[[1]])
-# names(allCorr)<-c("50v450 BaseT0", "50v450 BaseT10",
-#                   "50v250 BaseT0", "50v250 BaseT10",
-#                   "250v450 BaseT0", "250v450 BaseT10")
-# my.at <- seq(0, 1, 0.1)
-# corrFig<-levelplot(allCorr, layout=c(2,3), par.settings = YlOrRdTheme, at=my.at, margin=FALSE, main="Pearson-Corr (TopoWx 48-16)")+ 
-#   layer(sp.polygons(states))
+allCorr<-stack(corRasterDet_BaseT0[[1]], corRasterDet_BaseT10[[1]],
+               corRasterDet_BaseT0_250v50[[1]], corRasterDet_BaseT10_250v50[[1]],
+               corRasterDet_BaseT0_450v250[[1]], corRasterDet_BaseT10_450v250[[1]])
+names(allCorr)<-c("50v450 BaseT0", "50v450 BaseT10",
+                  "50v250 BaseT0", "50v250 BaseT10",
+                  "250v450 BaseT0", "250v450 BaseT10")
+my.at <- seq(0, 1, 0.1)
+corrFig<-levelplot(allCorr, layout=c(2,3), par.settings = YlOrRdTheme, at=my.at, margin=FALSE, main="Pearson-Corr (TopoWx 48-16)")+
+  layer(sp.polygons(states))
 # histFig<-histogram(allCorr, layout=c(2,3))
 # print(corrFig, split=c(1,1,1,2), more=TRUE)
 # print(histFig, split=c(1,2,1,2))
