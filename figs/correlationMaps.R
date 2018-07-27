@@ -28,9 +28,11 @@ my.at <- seq(0, 1, 0.1)
 corrFig<-levelplot(allCorr, layout=c(2,3), par.settings = YlOrRdTheme, at=my.at, margin=FALSE, main="Pearson-Corr (TopoWx 48-16)")+
   layer(sp.polygons(states))
 # histFig<-histogram(allCorr, layout=c(2,3))
+histFig<-histogram(allCorr[[1:2]], layout=c(1,2))
 # print(corrFig, split=c(1,1,1,2), more=TRUE)
 # print(histFig, split=c(1,2,1,2))
-
+summary(allCorr[[2]])
+cellStats(allCorr[[1]], stat='mean', na.rm=TRUE)
 
 # 50 v 450 
 my.at <- seq(0, 1, 0.1)

@@ -78,6 +78,14 @@ y<-c(35.983498,  41.281065)
 #y<-c(27.011566, 36.178183, 41.947674)
 # x<-c(-81.322725, -87.199672, -92.672159, -112.072393, -115.130783, -110.709217)
 # y<-c(27.011566, 36.178183, 41.947674, 32.314482, 41.470576, 44.710696)
+
+# east-lat transect
+# orlando 28.553918, -81.386595, atlanta 33.723028, -84.382518,
+# nashville 36.176936, -86.776413, Peoria 40.646502, -89.562244, Des Moines 41.676432, -93.544581
+# Minneapolis 44.973139, -93.265222
+x<-c(-81.386595, -86.776413, -93.544581)
+y<-c(28.553918, 36.176936, 41.676432)
+
 point<-data.frame(y,x)
 
 for(j in 1:nrow(point)){
@@ -142,14 +150,44 @@ colnames(gddTS)<-c("years","gdd50T0","gdd450T0","gdd50T10","gdd450T10")
     meansall$mean450<-as.numeric(as.character(meansall$mean450))
 }
 
-ggplot(gddTSall, aes(value,as.factor(years), color=zValue)) + 
-  geom_line(size = 0.75)+
+# get group stats
+library(dplyr)
+# get SDs 
+# gddTSall.sd <-gddTSall %>%
+#   group_by(thresh,base,point) %>%
+#   summarise(sd = round(sd(value), 2), zValue=round(mean(zValue), 2))
+# gdd50sd <- gddTSall.sd[ which(gddTSall.sd$thresh=="gdd50"),]
+#   gdd50sd$xpos<-150
+#   gdd50sd$ypos<-Inf
+# get SDs 
+gddTSall.corr <-gddTSall %>%
+  group_by(thresh,base,point) %>%
+  summarise(corr=round(sum(zValue)/69, 2), zValue=round(mean(zValue), 2))
+gdd50corr <- gddTSall.corr[ which(gddTSall.corr$thresh=="gdd50"),]
+  gdd50corr$xpos<-175
+  gdd50corr$ypos<-Inf  
+  
+
+
+p<-ggplot(gddTSall, aes(value,as.factor(years), color=zValue)) + 
+  geom_line(size = 1, lineend = "round")+
+  geom_point(size=0.5)+
   geom_vline(aes(xintercept=mean50), data=meansall) +
   geom_vline(aes(xintercept=mean450), data=meansall) +
-  facet_wrap(point~base, ncol = 2)+
+  facet_grid(point~base)+
   scale_y_discrete(breaks=c("1950","1960","1970","1980","1990","2000","2010"),
                    labels=c("1950","1960","1970","1980","1990","2000","2010"))+
-  scale_color_gradient2(low = "orange", mid="grey94", high = "green", limits=c(-1,1), oob=squish)
+  scale_color_gradient2(low = "orangered4", mid="grey65", high = "green4", limits=c(-1,1), oob=squish)+
+  theme_bw()
+
+# p + geom_text(data=gdd50sd, aes(x=xpos, y=ypos, 
+#                            label=paste0("SD: ", sd)), color="black",  size=3,
+#            vjust=2, parse=FALSE)
+ 
+p + geom_text(data=gdd50corr, aes(x=xpos, y=ypos, 
+                                label=paste0("r= ", corr)), color="black",  size=3,
+              vjust=2, parse=FALSE) 
+
 
 # make map
 map<-get_map(location = "USA", 
@@ -157,34 +195,39 @@ map<-get_map(location = "USA",
   #geom_point(data = point, aes(x = x, y = y, label=seq(1,j,1)), color = 'red', size = 3)
   geom_label(data = point, aes(x = x, y = y, label=seq(1,j,1)))
 
-p<-ggplot(gddTS, aes(value,as.factor(years), color=zProdT10)) + 
-   geom_line(size = 1)+
-   geom_vline(xintercept = mean50[[1]])+
-   geom_vline(xintercept = mean450[[1]])+
-   xlim(0,220)+
-  scale_y_discrete(breaks=c("1950","1960","1970","1980","1990","2000","2010"),
-                       labels=c("1950","1960","1970","1980","1990","2000","2010"))+
-  annotate("text", x = 2, y = 6, label = paste0("r=",round(cor(gdd50ts,gdd450ts),2)))+
-  annotate("text", x = 2, y = 9, label = paste0("df=",round(sd(gdd450ts-gdd50ts),2)))+
-  annotate("text", x = 2, y = 12, label = paste0("50=",round(sd(gdd50ts),2)))+
-  scale_color_gradient2(low = "orange", mid="grey94", high = "green", limits=c(-1,1), oob=squish)
-
-ggdraw() +
-  draw_plot(p, 0, 0, 1, 1) +
-  draw_plot(map, 0.65, 0.05, 0.5, 0.4, scale=0.8)
 
 
-boxP<-ggplot(gddTS, aes(variable, value)) + 
-  geom_boxplot(notch = FALSE, fatten=3) +
-  geom_hline(yintercept = mean50[[1]])+
-  geom_hline(yintercept = mean450[[1]])+
-  ylim(0,180)+
-  coord_flip()
-  
-boxDiff<-ggplot(gddDiffTS, aes(x="",y=gdd450.50Diff))+
-  geom_boxplot()+
-  ylim(0,120)+
-  coord_flip()
+
+
+# OLD code from pointExplorer2.R
+# p<-ggplot(gddTS, aes(value,as.factor(years), color=zProdT10)) + 
+#    geom_line(size = 1)+
+#    geom_vline(xintercept = mean50[[1]])+
+#    geom_vline(xintercept = mean450[[1]])+
+#    xlim(0,220)+
+#   scale_y_discrete(breaks=c("1950","1960","1970","1980","1990","2000","2010"),
+#                        labels=c("1950","1960","1970","1980","1990","2000","2010"))+
+#   annotate("text", x = 2, y = 6, label = paste0("r=",round(cor(gdd50ts,gdd450ts),2)))+
+#   annotate("text", x = 2, y = 9, label = paste0("df=",round(sd(gdd450ts-gdd50ts),2)))+
+#   annotate("text", x = 2, y = 12, label = paste0("50=",round(sd(gdd50ts),2)))+
+#   scale_color_gradient2(low = "orange", mid="grey94", high = "green", limits=c(-1,1), oob=squish)
+# 
+# ggdraw() +
+#   draw_plot(p, 0, 0, 1, 1) +
+#   draw_plot(map, 0.65, 0.05, 0.5, 0.4, scale=0.8)
+# 
+# 
+# boxP<-ggplot(gddTS, aes(variable, value)) + 
+#   geom_boxplot(notch = FALSE, fatten=3) +
+#   geom_hline(yintercept = mean50[[1]])+
+#   geom_hline(yintercept = mean450[[1]])+
+#   ylim(0,180)+
+#   coord_flip()
+#   
+# boxDiff<-ggplot(gddDiffTS, aes(x="",y=gdd450.50Diff))+
+#   geom_boxplot()+
+#   ylim(0,120)+
+#   coord_flip()
 
 
 
