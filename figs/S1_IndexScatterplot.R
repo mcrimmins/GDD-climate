@@ -1,0 +1,60 @@
+# Season length, start and correlation scatterplots
+# 8/10/18 MAC
+
+library(raster)
+library(reshape)
+library(ggplot2)
+library(cowplot)
+
+# linear model  BASE 10----
+# load mask
+maskNA<-raster("./fixed/maskNAalt.grd")
+# load datasets
+load("./fixed/bothBaseT/pearsonCorrBaseT10.RData")
+load("./fixed/bothBaseT/sDevsBothBaseT_Detrended.RData")
+temp<-stack(mask(sdDiff50_450Res,maskNA), mask(sdGDD50Res,maskNA), mask(corRasterDet_BaseT10[[1]],maskNA))
+names(temp) <- c('duration', 'start', 'corr')
+
+# ggplot version
+v1 <- data.frame((values(temp)))
+
+# linear model BASE 0----
+# load mask
+maskNA_0<-raster("./fixed/maskNAalt_baseT0.grd") 
+# load datasets
+load("./fixed/bothBaseT/pearsonCorrBaseT0.RData")
+load("./fixed/bothBaseT/sDevsBothBaseT_Detrended.RData")
+temp<-stack(mask(sdDiff50_450_0Res,maskNA_0), mask(sdGDD50_0Res,maskNA_0), mask(corRasterDet_BaseT0[[1]],maskNA_0))
+names(temp) <- c('duration', 'start', 'corr')
+
+# ggplot version
+v2 <- data.frame((values(temp)))
+
+# plot
+p1<-ggplot(v1, aes(x=start, y=duration, color=corr)) + 
+  geom_point(shape=16, size=0.25,alpha = 0.3)+
+  #geom_smooth(method=lm, se=FALSE)+
+  geom_abline()+
+  scale_color_gradient(low = "#0091ff", high = "#f0650e", limits=c(0,1))+
+  theme_bw()+
+  ylim(0,35)+xlim(0,35)+
+  labs(x="SDev GDD50 DOY", y="SDev GDD450-50 DOY", color="Corr (r)", 
+       title="BaseT10 - Season start vs season length variability")+
+  theme_bw(base_size=5)
+  
+
+p2<-ggplot(v2, aes(x=start, y=duration, color=corr)) + 
+  geom_point(shape=16, size=0.25,alpha = 0.3)+
+  #geom_smooth(method=lm, se=FALSE)+
+  geom_abline()+
+  scale_color_gradient(low = "#0091ff", high = "#f0650e", limits=c(0,1))+
+  theme_bw()+
+  ylim(0,35)+xlim(0,35)+
+  labs(x="SDev GDD50 DOY", y="SDev GDD450-50 DOY", color="Corr (r)", 
+       title="BaseT0 - Season start vs season length variability")+
+  theme_bw(base_size=5)+
+  guides(colour=FALSE)
+
+pALL<-plot_grid(p2, p1, labels = c("a", "b"), label_size = 6, rel_widths = c(1,1.25))
+
+ggsave(plot = pALL, width = 5, height = 2.5, units = "in",dpi = 300, filename = "./figs/figS1.png")

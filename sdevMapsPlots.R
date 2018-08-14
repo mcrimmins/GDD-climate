@@ -8,7 +8,6 @@ library(maptools)
 library(reshape2)
 library(tidyr)
 
-
 # map layers
 states <- getData('GADM', country='United States', level=1)
 
@@ -32,11 +31,14 @@ meanDayGDD250B0<-raster("./fixed/X4_meanDOY_baseT0_thresh250_1981-2010.grd")
 meanDayGDD450B0<-raster("./fixed/X4_meanDOY_baseT0_thresh450_1981-2010.grd")
 
 
+# DOY colorramp
+mapTheme <- rasterTheme(region=brewer.pal(11,"Spectral"))
+
 # plot mean DOY - BASET10
 meanDOY<-stack(mask(meanDayGDD50, maskNA),mask(meanDayGDD250, maskNA),mask(meanDayGDD450,maskNA))
 names(meanDOY)<-c("GDD50","GDD250","GDD450")
 my.at <- seq(0, 240, 10)
-meanFig10<-levelplot(meanDOY, layout=c(1,3),at=my.at, par.settings = viridisTheme,
+meanFig10<-levelplot(meanDOY, layout=c(1,3),at=my.at, par.settings = mapTheme,
                    margin=FALSE, main="Mean GDD-BaseT10", colorkey=list(space="bottom"),
                    xlab='', ylab='') #+ 
   #layer(sp.polygons(states))
@@ -52,7 +54,7 @@ sdevFig10<-levelplot(sDev, layout=c(1,3),at=my.at, par.settings = YlOrRdTheme,
 meanDOY<-stack(mask(meanDayGDD50B0, maskNA_0),mask(meanDayGDD250B0, maskNA_0),mask(meanDayGDD450B0,maskNA_0))
 names(meanDOY)<-c("GDD50","GDD250","GDD450")
 my.at <- seq(0, 240, 10)
-meanFig0<-levelplot(meanDOY, layout=c(1,3),at=my.at, par.settings = viridisTheme,
+meanFig0<-levelplot(meanDOY, layout=c(1,3),at=my.at, par.settings = mapTheme,
                      margin=FALSE, main="Mean GDD-BaseT0", colorkey=list(space="bottom"),
                     xlab='', ylab='') #+ 
 #layer(sp.polygons(states))

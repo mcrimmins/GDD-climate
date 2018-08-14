@@ -24,16 +24,44 @@ allCorr<-stack(corRasterDet_BaseT0[[1]], corRasterDet_BaseT10[[1]],
 names(allCorr)<-c("50v450 BaseT0", "50v450 BaseT10",
                   "50v250 BaseT0", "50v250 BaseT10",
                   "250v450 BaseT0", "250v450 BaseT10")
-my.at <- seq(0, 1, 0.1)
+my.at <- seq(0, 1, 0.05)
+#mapTheme <- rasterTheme(region=brewer.pal(11,"OrRd"))
 corrFig<-levelplot(allCorr, layout=c(2,3), par.settings = YlOrRdTheme, at=my.at, margin=FALSE, main="Pearson-Corr (TopoWx 48-16)")+
   layer(sp.polygons(states))
+
+allpval<-stack(corRasterDet_BaseT0[[2]], corRasterDet_BaseT10[[2]],
+               corRasterDet_BaseT0_250v50[[2]], corRasterDet_BaseT10_250v50[[2]],
+               corRasterDet_BaseT0_450v250[[2]], corRasterDet_BaseT10_450v250[[2]])
+my.at <- seq(0, 0.05, 0.025)
+pvalFig<-levelplot(allpval, layout=c(2,3), par.settings = GrTheme, at=my.at, margin=FALSE)
+
+# add together
+corr.at <- seq(0, 1, 0.05)
+pval.at <- seq(0.05, 0.95, 0.5)
+p0 <- levelplot(allCorr, par.settings = YlOrRdTheme, at=corr.at, layout=c(2,3), main="Pearson-Corr (TopoWx 48-16)")
+p1 <- levelplot(allpval, par.settings =GrTheme, at=pval.at,layout=c(2,3),alpha.regions=0.6)
+p0+p1+layer(sp.polygons(states))
+
+# plot one map with overlay
+p0 <- levelplot(allCorr[[1]], par.settings = YlOrRdTheme, at=corr.at, main="Pearson-Corr (TopoWx 48-16)")
+p1 <- levelplot(allpval[[1]], par.settings =GrTheme, at=pval.at,alpha.regions=0.6)
+p0+p1+layer(sp.polygons(states))
+
 # histFig<-histogram(allCorr, layout=c(2,3))
 histFig<-histogram(allCorr[[1:2]], layout=c(1,2))
 # print(corrFig, split=c(1,1,1,2), more=TRUE)
 # print(histFig, split=c(1,2,1,2))
 summary(allCorr[[2]])
-cellStats(allCorr[[1]], stat='mean', na.rm=TRUE)
-
+stats <- data.frame(Layer=character(0),
+                    mean=double(0),
+                    sdev=double(0),
+                 stringsAsFactors=FALSE)
+stats<-stats[1:nlayers(allCorr),]
+for (i in 1:nlayers(allCorr)){
+  stats$Layer[i]<-names(allCorr)[i]
+  stats$mean[i]<-cellStats(allCorr[[i]], stat='mean', na.rm=TRUE)
+  stats$sdev[i]<-cellStats(allCorr[[i]], stat='sd', na.rm=TRUE)
+}
 # 50 v 450 
 my.at <- seq(0, 1, 0.1)
 levelplot(corRaster_BaseT0[[1]], par.settings = YlOrRdTheme, at=my.at, margin=FALSE, main="GDD50x4/GDD450x4 BaseT0 Pearson-Corr (TopoWx 48-16)")+ 
@@ -186,9 +214,6 @@ p<-gplot(corRasterDet_BaseT0[[1]]) + geom_tile(aes(fill = value)) +
   plot_grid(fig1, fig2, hist1, hist2, 
             labels = c("A", "B", "C","D"),
             ncol = 2, nrow = 2)
-  
-  
-  
   
   
   # gplot script - gets data from raster

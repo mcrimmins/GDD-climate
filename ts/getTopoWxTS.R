@@ -10,9 +10,9 @@ library(scales)
 library(rgdal)
 
 # get cluster boundaries into GDP https://cida.usgs.gov/gdp/client/#!advanced/spatial
-cluster12 <- readShapePoly("./mapFiles/cluster12poly")
-proj4string(cluster12) <- "+proj=longlat +datum=WGS84"
-writeOGR(cluster12, ".", "./mapFiles/cluster12rgdal", driver="ESRI Shapefile")
+#cluster12 <- readShapePoly("./mapFiles/cluster12poly")
+#proj4string(cluster12) <- "+proj=longlat +datum=WGS84"
+#writeOGR(cluster12, ".", "./mapFiles/cluster12rgdal", driver="ESRI Shapefile")
 
 # ---- from https://owi.usgs.gov/R/training-curriculum/usgs-packages/geoknife-exercises/
 # First, you need to query for all web data
@@ -32,7 +32,9 @@ airtemp_fabric <- webdata(list(
 # NPN TN 36.440838, -84.323586
 # MN near Fargo 47.102994, -96.687827
 # FL near Orlando 29.233094, -81.904940
-coords<-c(-81.904940, 29.233094)
+# Nashville 36.176936, -86.776413
+# low corr spot in NW NV 41.834227, -119.316589
+coords<-c(-119.316589, 41.834227)
 location <- simplegeom(coords)
 
 # Leave the default knife since we want an average over the stencil
@@ -42,11 +44,11 @@ airtemp_job <- geoknife(stencil = location, fabric = airtemp_fabric, wait=TRUE)
 # Download the data
 tempData <- result(airtemp_job)
 # save downloaded data?
-save.image("~/RProjects/TopoWx/TopoWxTS_FL.RData")
+save.image("~/RProjects/TopoWx/TopoWxTS_NWNV.RData")
 
 
 #---- load existing data?
-load("~/RProjects/TopoWx/ts/TopoWxTS_FL.RData")
+load("~/RProjects/TopoWx/TopoWxTS_Nashville.RData")
 
 
 # reshape and get tmean
@@ -62,10 +64,10 @@ tempDataWide$doy<-strptime(tempDataWide$DateTime, "%Y-%m-%d")$yday+1
 
 
 # calc GDDs
-baseT<-10
+baseT<-0
 tempDataWide$tmean <- unlist(lapply(tempDataWide$tmean, function(x) ifelse(x>=baseT, x-baseT, 0)))
 
-tempDataWide$tmean[tempDataWide$tmean < baseT] <- 0
+#tempDataWide$tmean[tempDataWide$tmean < baseT] <- 0
 cumGDD <- tempDataWide %>% 
   dplyr::group_by(year, doy) %>% # still doesn't quite work adjYear kicks off before adjDOY
   dplyr::summarise(value = sum(tmean)) %>%
@@ -99,9 +101,10 @@ p<-ggplot(gathQuant,aes(date,values))+
   theme_bw()
 p1<-p + geom_line(data=currYear,aes(DateTime,GDD, colour=Year), size=1)+
 scale_x_datetime(labels = date_format("%m/%d"), limits = as.POSIXct(c(paste0(plotYr,"-01-01"),paste0(plotYr,"-07-01"))))+
-  labs(x='calendar day', y='GDD(base10C)',title=paste0('Cumulative Growing Degree Days (',coords[1],",",coords[2],")"))+
+  labs(x='calendar day', y='GDD(base0C)',title=paste0('Cumulative Growing Degree Days (',coords[1],",",coords[2],")"))+
   geom_hline(yintercept=50)+
-  geom_hline(yintercept=500)+
+  geom_hline(yintercept=250)+
+  geom_hline(yintercept=450)+
   ylim(0,1000)
 
 
@@ -154,9 +157,10 @@ p<-ggplot(gathTemp,aes(date,values))+
   geom_line(aes(linetype=stat), size=0.1)+
   theme_bw()
 p2<-p + geom_line(data=currYear,aes(DateTime,tmean, colour=Year), size=1)+
-  scale_x_datetime(labels = date_format("%m/%d"), limits = as.POSIXct(c(paste0(plotYr,"-01-01"),paste0(plotYr,"-07-01"))))+
+  scale_x_datetime(labels = date_format("%m/%d"), limits = as.POSIXct(c(paste0(plotYr,"-01-01"),paste0(plotYr,"-12-31"))))+
   labs(x='calendar day', y='deg C',title=paste0('Daily Avg Temp (C) (',coords[1],",",coords[2],")"))+
-  geom_hline(yintercept=10)
+  geom_hline(yintercept=10)+
+  geom_hline(yintercept=0)
 
 # plot anomalies
 ggplot(currYear, aes(x=DateTime, y=tmeanAnom, fill=pos)) +
