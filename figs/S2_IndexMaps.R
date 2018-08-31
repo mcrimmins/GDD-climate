@@ -25,9 +25,19 @@ load("./fixed/bothBaseT/pearsonCorrBaseT0.RData")
 load("./fixed/bothBaseT/sDevsBothBaseT_Detrended.RData")
 
 temp<-stack(mask(sdDiff50_450_0Res/sdGDD50_0Res,maskNA_0), 
-            mask(sdDiff50_450Res/sdGDD50Res,maskNA)
+            mask(sdDiff250_50_0Res/sdGDD50_0Res,maskNA_0),
+            mask(sdDiff450_250_0Res/sdGDD250_0Res,maskNA_0),
+            mask(sdDiff50_450Res/sdGDD50Res,maskNA),
+            mask(sdDiff250_50Res/sdGDD50Res,maskNA),
+            mask(sdDiff450_250Res/sdGDD250Res,maskNA)
             )
-names(temp) <- c("Index-T0", "Index-T10")
+# add together
+col.titles = c('Full Season-Base 0C (50v450)',
+               'Early Season-Base 0C (50v250)',
+               'Late Season-Base 0C (250v450)',
+               'Full Season-Base 10C (50v450)',
+               'Early Season-Base 10C (50v250)',
+               'Late Season-Base 10C (250v450)')
 
 # custom color ramp https://stackoverflow.com/questions/47459083/levelplot-color-key-range-and-extremes
 #max(values(temp), na.rm = TRUE)
@@ -35,20 +45,21 @@ names(temp) <- c("Index-T0", "Index-T10")
 
 index.at=c(min(values(temp), na.rm = TRUE),0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1,1.05,1.1, max(values(temp), na.rm = TRUE))
 my.brks=seq(0.1, 1.5, by=0.1) # needs to match num of index.at
-myColorkey <- list(at=my.brks, labels=list(at=my.brks, labels=c(0, 0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1,1.05,1.1, 10)), space="bottom")
+myColorkey <- list(at=my.brks, labels=list(at=my.brks, labels=c(0, 0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1,1.05,1.1, 10)), 
+                   space="bottom")
 reds = brewer.pal(5, "YlOrRd")
 greens = brewer.pal(4, "Greens")
 blues = brewer.pal(5, "Blues")
-mapTheme <- rasterTheme(region=c('white', blues, greens, reds, "gray"))
+mapTheme <- rasterTheme(region=c('gray95', blues, greens, reds, "gray65"))
 
 # plot maps
 #mapTheme <- rasterTheme(region=brewer.pal(11,"Spectral"))
-text2add<-c('a','b')
-col.titles = c('50v450 (T0)','50v450 (T10)')
+text2add<-c('a','b','c','d','e','f')
+#col.titles = c('50v450 (T0)','50v450 (T10)')
 
 #index.at <- seq(0, 6, 0.05)
 p0 <- levelplot(temp, par.settings = mapTheme, ylab=NULL, xlab=NULL, colorkey=myColorkey,
-                at=index.at, names.attr=col.titles, layout=c(2,1),  scales=list(alternating=3))+ #scales=list(draw=FALSE)
+                at=index.at, names.attr=col.titles, layout=c(3,2),  scales=list(alternating=3))+ #scales=list(draw=FALSE)
   layer(panel.text(-120, 26, text2add[panel.number()],  cex=1))+
   layer(sp.polygons(states))
 

@@ -67,15 +67,15 @@ meanDOY450T0 <- mask(meanDOY450T0, maskNA_0)
 # orlando 28.553918, -81.386595, atlanta 33.723028, -84.382518,
 # nashville 36.176936, -86.776413, Peoria 40.646502, -89.562244, Des Moines 41.676432, -93.544581
 # Minneapolis 44.973139, -93.265222
-x<-c(-81.386595, -84.382518, -86.776413, -93.544581, -85.327310)
-y<-c(28.553918, 33.723028, 36.176936, 41.676432, 46.612546)
+#x<-c(-81.386595, -84.382518, -86.776413, -93.544581, -85.327310)
+#y<-c(28.553918, 33.723028, 36.176936, 41.676432, 46.612546)
 # point in upper peninsula
 #46.612546, -85.327310
 #x<-c(-85.327310)
 #y<-c(46.612546)
 # 4 points
-#x<-c(-81.386595, -86.776413, -93.544581, -85.327310)
-#y<-c(28.553918, 36.176936, 41.676432, 46.612546)
+x<-c(-81.386595, -86.776413, -93.544581, -85.327310)
+y<-c(28.553918, 36.176936, 41.676432, 46.612546)
 
 
 point<-data.frame(y,x)
@@ -156,20 +156,37 @@ gddTSall.corr <-gddTSall %>%
   group_by(thresh,base,point) %>%
   summarise(corr=round(sum(zValue)/69, 2), zValue=round(mean(zValue), 2))
 gdd50corr <- gddTSall.corr[ which(gddTSall.corr$thresh=="gdd50"),]
-gdd50corr$xpos<-260
+gdd50corr$xpos<-Inf #260
 gdd50corr$ypos<-Inf  
-gdd50corr$letter<-c('a','c','e','g','i','b','d','f','h','j')
-gdd50corr$letterX<--10
+gdd50corr$letter<-c('a','c','e','g','b','d','f','h')
+gdd50corr$letterX<--Inf #-10
 gdd50corr$letterY<-Inf # or Inf 
 gdd50corr$corrLabel<-sprintf("%.2f", gdd50corr$corr)
 
+# calculate sd ratio
+library(tidyr)
+gddTSallDiff<-gddTSall %>% spread(thresh,value)
+  gddTSallDiff$diff<-gddTSallDiff$gdd450-gddTSallDiff$gdd50
+  gddTSallDiff<-melt(gddTSallDiff, measure.vars=c("gdd450", "gdd50"))
+  colnames(gddTSallDiff)<-c("years","base","point", "zProd", "zValue", "diff","thresh","value")
+gddTSall.sd <-gddTSallDiff %>%
+  group_by(thresh,base,point) %>%
+  summarise(sdT1=round(sd(value),2), sdT1T2=round(sd(diff),2))
+gddTSall.sd$ratio<-round(gddTSall.sd$sdT1T2/gddTSall.sd$sdT1,2)
+gdd50ratio <- gddTSall.sd[ which(gddTSall.sd$thresh=="gdd50"),]
+gdd50ratio$xpos<-Inf
+gdd50ratio$ypos<--Inf 
+gdd50ratio$ratioLabel<-sprintf("%.2f", gdd50ratio$ratio)
+
+# change facet labels
+labels <- c("0"="BaseT 0°C", "10"="BaseT 10°C") 
 
 p<-ggplot(gddTSall, aes(value,as.factor(years), color=zValue)) + 
   geom_line(size = 0.15, lineend = "round")+
   geom_point(size=0.1)+
   geom_vline(aes(xintercept=mean50), data=meansall, size=0.15, color='black') +
   geom_vline(aes(xintercept=mean450), data=meansall, size=0.15, color='black') +
-  facet_grid(point~base)+
+  facet_grid(point~base, labeller=labeller(base = labels))+
   scale_y_discrete(breaks=c("1950","1960","1970","1980","1990","2000","2010"),
                    labels=c("1950","1960","1970","1980","1990","2000","2010"))+
   scale_color_gradient2(low = "firebrick3", mid="grey65", high = "royalblue3", limits=c(-1,1), oob=squish,
@@ -181,8 +198,8 @@ p<-ggplot(gddTSall, aes(value,as.factor(years), color=zValue)) +
   theme(legend.position="bottom",legend.direction="horizontal", legend.justification = "center",
         legend.text=element_text(size=8),
         legend.title=element_text(size=8),
-        strip.background = element_blank(),
-        strip.text.x = element_blank())+ # strip.text.y = element_blank()
+        strip.background = element_blank())+
+        #strip.text.x = element_text(c("Base 0C", "Base 10C")))+ # strip.text.y = element_blank()
         #legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'))+
   guides(colour = guide_colourbar(title.position="top", title.hjust = 0.5))
 
@@ -192,11 +209,14 @@ p<-ggplot(gddTSall, aes(value,as.factor(years), color=zValue)) +
 #            vjust=2, parse=FALSE)
 
 pALL<-p + geom_text(data=gdd50corr, aes(x=xpos, y=ypos, 
-                                  label=paste0("r= ", corrLabel)), color="black",  size=3,
-              vjust=2, parse=FALSE) +
-          geom_text(data=gdd50corr, aes(x=letterX, y=letterY, 
+                                  label=paste0("r= ", corrLabel)), color="black",  size=2,
+              vjust=1.5,hjust=1.1, parse=FALSE) +
+          geom_text(data=gdd50corr, aes(x=letterX, y=letterY,
                                 label=letter), color="black",  size=3,
-            vjust=2, parse=FALSE)
+            vjust=1.1,hjust=-0.5, parse=FALSE)
+pALL<-pALL  +   geom_text(data=gdd50ratio, aes(x=xpos, y=ypos, 
+                                label=paste0("", ratioLabel)), color="black",  size=2,
+            vjust=-0.5,hjust=1.1, parse=FALSE)
 
 # ggsave(plot = pALL, width = 4, height = 5, units = "in",dpi = 300, filename = "./figs/fig3.png")
 # 

@@ -17,13 +17,19 @@ rasterOptions(progress = 'text')
 load("./fixed/bothBaseT/pearsonCorrBaseT10.RData")
 load("./fixed/bothBaseT/pearsonCorrBaseT0.RData")
 # plot all corrs in one stack
-allCorr<-stack(corRasterDet_BaseT0[[1]], corRasterDet_BaseT10[[1]],
-               corRasterDet_BaseT0_250v50[[1]], corRasterDet_BaseT10_250v50[[1]],
-               corRasterDet_BaseT0_450v250[[1]], corRasterDet_BaseT10_450v250[[1]])
+allCorr<-stack(corRasterDet_BaseT0[[1]], 
+               corRasterDet_BaseT0_250v50[[1]], 
+               corRasterDet_BaseT0_450v250[[1]], 
+               corRasterDet_BaseT10[[1]],
+               corRasterDet_BaseT10_250v50[[1]],
+               corRasterDet_BaseT10_450v250[[1]])
 
-allpval<-stack(corRasterDet_BaseT0[[2]], corRasterDet_BaseT10[[2]],
-               corRasterDet_BaseT0_250v50[[2]], corRasterDet_BaseT10_250v50[[2]],
-               corRasterDet_BaseT0_450v250[[2]], corRasterDet_BaseT10_450v250[[2]])
+allpval<-stack(corRasterDet_BaseT0[[2]], 
+               corRasterDet_BaseT0_250v50[[2]], 
+               corRasterDet_BaseT0_450v250[[2]], 
+               corRasterDet_BaseT10[[2]],
+               corRasterDet_BaseT10_250v50[[2]],
+               corRasterDet_BaseT10_450v250[[2]])
 
 # get stats
 stats <- data.frame(Layer=character(0),
@@ -36,12 +42,18 @@ for (i in 1:nlayers(allCorr)){
   stats$mean[i]<-cellStats(allCorr[[i]], stat='mean', na.rm=TRUE)
   stats$sdev[i]<-cellStats(allCorr[[i]], stat='sd', na.rm=TRUE)
 }
-stats$panel<-c('a','b','c','d','e','f')
+stats$panel<-c('a','c','e','b','d','f')
 # labels for panels
-text2add<-paste0(stats$panel,'. mean/SD r: ',round(stats$mean,2),'±',round(stats$sdev,2))
+text2add<-paste0(stats$panel,'. ',round(stats$mean,2),'±',round(stats$sdev,2))
 
 # add together
-col.titles = c('50v450 (T0)','50v450 (T10)','50v250 (T0)','50v250 (T10)','250v450 (T0)','250v450 (T10)')
+col.titles = c('Full Season-Base 0C (50v450)',
+               'Early Season-Base 0C (50v250)',
+               'Late Season-Base 0C (250v450)',
+               'Full Season-Base 10C (50v450)',
+               'Early Season-Base 10C (50v250)',
+               'Late Season-Base 10C (250v450)')
+               
 #row.titles = c('row1','row2')
 #levelplot(s, layout=c(2,2), names.attr=col.titles,ylab=row.titles)
 # see https://stat.ethz.ch/pipermail/r-sig-geo/2017-July/025840.html
@@ -51,9 +63,9 @@ pval.at <- seq(0.05, 0.95, 0.5)
 p0 <- levelplot(allCorr, par.settings = YlOrRdTheme, ylab=NULL, xlab=NULL, 
                 sub=list(label="             Pearson r",cex=0.75,font = 1),
                 at=corr.at, names.attr=col.titles, par.strip.text=list(cex=0.75),
-                layout=c(2,3),  scales=list(alternating=3, cex=0.5), #scales=list(draw=FALSE)
+                layout=c(3,2),  scales=list(alternating=3, cex=0.5), #scales=list(draw=FALSE)
                 colorkey=list(space="bottom", width=0.8, height=1, cex=0.75))+ # width=1, height=0.5, row=3, column=1, 
-                layer(panel.text(-111, 26, text2add[panel.number()],  cex=0.4)) 
+                layer(panel.text(-116, 26, text2add[panel.number()],  cex=0.5)) 
 p1 <- levelplot(allpval, par.settings =GrTheme, at=pval.at,layout=c(2,3),alpha.regions=0.9)
 p<-p0+p1+layer(sp.polygons(states, col = 'gray40', lwd=0.3))
 
