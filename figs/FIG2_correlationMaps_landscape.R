@@ -47,12 +47,12 @@ stats$panel<-c('a','c','e','b','d','f')
 text2add<-paste0(stats$panel,'. ',round(stats$mean,2),'±',round(stats$sdev,2))
 
 # add together
-col.titles = c('Full Season-Base 0C (50v450)',
-               'Early Season-Base 0C (50v250)',
-               'Late Season-Base 0C (250v450)',
-               'Full Season-Base 10C (50v450)',
-               'Early Season-Base 10C (50v250)',
-               'Late Season-Base 10C (250v450)')
+col.titles = c('Full Season (50GDD-450GDD, 0°C base temp)',
+               'Early Season (50GDD-250GDD, 0°C base temp)',
+               'Late Season (250GDD-450GDD, 0°C base temp)',
+               'Full Season (50GDD-450GDD, 10°C base temp)',
+               'Early Season (50GDD-250GDD, 10°C base temp)',
+               'Late Season (250GDD-450GDD, 10°C base temp)')
                
 #row.titles = c('row1','row2')
 #levelplot(s, layout=c(2,2), names.attr=col.titles,ylab=row.titles)
@@ -61,8 +61,8 @@ col.titles = c('Full Season-Base 0C (50v450)',
 corr.at <- seq(0, 1, 0.025)
 pval.at <- seq(0.05, 0.95, 0.5)
 p0 <- levelplot(allCorr, par.settings = YlOrRdTheme, ylab=NULL, xlab=NULL, 
-                sub=list(label="             Pearson r",cex=0.75,font = 1),
-                at=corr.at, names.attr=col.titles, par.strip.text=list(cex=0.75),
+                sub=list(label="             Pearson's r",cex=0.75,font = 1),
+                at=corr.at, names.attr=col.titles, par.strip.text=list(cex=0.5),
                 layout=c(3,2),  scales=list(alternating=3, cex=0.5), #scales=list(draw=FALSE)
                 colorkey=list(space="bottom", width=0.8, height=1, cex=0.75))+ # width=1, height=0.5, row=3, column=1, 
                 layer(panel.text(-116, 26, text2add[panel.number()],  cex=0.5)) 

@@ -38,9 +38,9 @@ p1<-ggplot(v1, aes(x=start, y=duration, color=corr)) +
   scale_color_gradient(low = "#0091ff", high = "#f0650e", limits=c(0,1))+
   theme_bw()+
   ylim(0,35)+xlim(0,35)+
-  labs(x="SDev GDD50 DOY", y="SDev GDD450-50 DOY", color="Corr (r)", 
-       title="BaseT10 - Season start vs season length variability")+
-  theme_bw(base_size=5)
+  labs(x="SD(T1) - days", y="SD(duration) - days", color="Pearson's r", 
+       title="Season Start vs Duration Variability (10°C base temp)")+
+  theme_bw(base_size=4.5)
   
 
 p2<-ggplot(v2, aes(x=start, y=duration, color=corr)) + 
@@ -50,11 +50,11 @@ p2<-ggplot(v2, aes(x=start, y=duration, color=corr)) +
   scale_color_gradient(low = "#0091ff", high = "#f0650e", limits=c(0,1))+
   theme_bw()+
   ylim(0,35)+xlim(0,35)+
-  labs(x="SDev GDD50 DOY", y="SDev GDD450-50 DOY", color="Corr (r)", 
-       title="BaseT0 - Season start vs season length variability")+
-  theme_bw(base_size=5)+
+  labs(x="SD(T1) - days", y="SD(duration) - days", color="Pearson's r", 
+       title="Season Start vs Duration Variability (0°C base temp)")+
+  theme_bw(base_size=4.5)+
   guides(colour=FALSE)
 
 pALL<-plot_grid(p2, p1, labels = c("a", "b"), label_size = 6, rel_widths = c(1,1.25))
 
-ggsave(plot = pALL, width = 5, height = 2.5, units = "in",dpi = 300, filename = "./figs/figS1.png")
+ggsave(plot = pALL, width = 5, height = 2.5, units = "in",dpi = 300, filename = "./figs/S2_scatterplot.png")
