@@ -27,7 +27,6 @@ corrs <- data.frame(matrix(ncol =length(startDates), nrow = length(baseTs)))
   rownames(corrs) <- as.character(baseTs)
 
 for(i in 1:length(startDates)){
-
     # reshape and get tmean
     tempDataWide <- spread(tempData, variable, bufferedPoint)
     tempDataWide$tmean<-(tempDataWide$tmax+tempDataWide$tmin)/2
@@ -36,6 +35,7 @@ for(i in 1:length(startDates)){
     tempDataWide$year<-as.numeric(format(tempDataWide$DateTime, "%Y"))
     tempDataWide$day<-as.numeric(format(tempDataWide$DateTime, "%d"))
     tempDataWide$doy<-strptime(tempDataWide$DateTime, "%Y-%m-%d")$yday+1  
+    # --test impact of leap year--
     #tempDataWide<-filter(tempDataWide, month!=2 | day!=29)
     #tempDataWide<-filter(tempDataWide, month!=12 | day!=31)
     
