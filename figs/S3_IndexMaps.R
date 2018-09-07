@@ -56,7 +56,7 @@ mapTheme <- rasterTheme(region=c("#72002f", spectral,'#413772'))
 
 # plot maps
 #mapTheme <- rasterTheme(region=brewer.pal(11,"Spectral"))
-text2add<-c('a','b','c','d','e','f')
+text2add<-c('a','c','e','b','d','f')
 #col.titles = c('50v450 (T0)','50v450 (T10)')
 
 #index.at <- seq(0, 6, 0.05)
