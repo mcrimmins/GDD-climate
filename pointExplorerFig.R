@@ -103,6 +103,11 @@ y<-c(43.395436)
 x<-c(-106.494818, -120.151040)
 y<-c(39.195307, 38.900513)
 
+# Dan Herms data
+#Dow Gardens, Midland, MI: 43.623310, -84.252870
+#Secrist Arboretum, Wooster, OH: 40.783453, -81.917416
+x<-c(-84.252870, -81.917416)
+y<-c(43.623310, 40.783453)
 
 point<-data.frame(y,x)
 

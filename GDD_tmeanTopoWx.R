@@ -15,8 +15,8 @@ rasterOptions(progress = 'text')
 
 #Set call to dataset via OpenDap
  yr<-2016
-# topowx.min <- paste0("/scratch/crimmins/topowx/download.scrim.psu.edu/TopoWx/release_2017-07/daily/tmin/tmin_",yr,".nc")
-# topowx.max <- paste0("/scratch/crimmins/topowx/download.scrim.psu.edu/TopoWx/release_2017-07/daily/tmax/tmax_",yr,".nc")
+ topowx.min <- paste0("/scratch/crimmins/topowx/download.scrim.psu.edu/TopoWx/release_2017-07/daily/tmin/tmin_",yr,".nc")
+ topowx.max <- paste0("/scratch/crimmins/topowx/download.scrim.psu.edu/TopoWx/release_2017-07/daily/tmax/tmax_",yr,".nc")
 
 # local files
 topowx.min <- paste0("./topoWxData/tmin_",yr,".nc")
@@ -26,6 +26,17 @@ topowx.max <- paste0("./topoWxData/tmax_",yr,".nc")
 #"load" data into R via Raster package
 tmin <- brick(topowx.min, varname="tmin",  ncdf=TRUE)
 tmax <- brick(topowx.max, varname="tmax",  ncdf=TRUE)
+
+# point extract testing...
+# hard code in points
+# point<-data.frame(36.176936,-86.776413) # Nashville
+# #point<-data.frame(41.676432,-93.544581) # Des Moines
+# colnames(point)<-c("y","x")
+# # get time series
+# tminTS<-t(raster::extract(tmin, cellFromXY(tmin, c(point$x,point$y))))
+# tmaxTS<-t(raster::extract(tmax, cellFromXY(tmax, c(point$x,point$y))))
+
+
 
 # subset for testing - Jan 1 thru July 1
 #tmin <- subset(tmin, 1:182)

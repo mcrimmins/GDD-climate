@@ -48,6 +48,16 @@ plot(clusterpoly, add=TRUE)
 
 point<-click(corRaster[[1]], n=1, xy=TRUE, show=FALSE, type="p")
 
+# Dan Herms data
+#Dow Gardens, Midland, MI: 43.623310, -84.252870
+x<-c(-84.252870)
+y<-c(43.623310)
+#Secrist Arboretum, Wooster, OH: 40.783453, -81.917416
+x<-c( -81.917416)
+y<-c(40.783453)
+
+point<-data.frame(y,x)
+
 # make map
 map<-get_map(location = c(lon = point$x, lat = point$y), 
         zoom = 5, source = "google", maptype = "terrain") %>% ggmap() +
