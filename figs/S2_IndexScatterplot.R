@@ -39,9 +39,14 @@ p1<-ggplot(v1, aes(x=start, y=duration, color=corr)) +
   theme_bw()+
   ylim(0,35)+xlim(0,35)+
   labs(x="SD(T1) - days", y="SD(duration) - days", color="Pearson's r", 
-       title="Season Start vs Duration Variability (10°C base temp)")+
-  theme_bw(base_size=4.5)
-  
+       title="b) Season Start vs Duration Variability (10°C base temp)")+
+  #theme_bw(base_size=6)
+  theme(axis.text=element_text(size=5.5),
+        axis.title=element_text(size=5.5),
+        plot.title=element_text(size=5,face="bold"),
+        legend.text = element_text(size=5),
+        legend.title = element_text(size=5),
+        legend.key.width=unit(0.5,"line"))
 
 p2<-ggplot(v2, aes(x=start, y=duration, color=corr)) + 
   geom_point(shape=16, size=0.25,alpha = 0.3)+
@@ -51,10 +56,17 @@ p2<-ggplot(v2, aes(x=start, y=duration, color=corr)) +
   theme_bw()+
   ylim(0,35)+xlim(0,35)+
   labs(x="SD(T1) - days", y="SD(duration) - days", color="Pearson's r", 
-       title="Season Start vs Duration Variability (0°C base temp)")+
-  theme_bw(base_size=4.5)+
+       title="a) Season Start vs Duration Variability (0°C base temp)")+
+  #theme_bw(base_size=6)+
+  theme(axis.text=element_text(size=5.5),
+        axis.title=element_text(size=5.5),
+        plot.title=element_text(size=5,face="bold"),
+        legend.text = element_text(size=5),
+        legend.title = element_text(size=5))+
   guides(colour=FALSE)
 
-pALL<-plot_grid(p2, p1, labels = c("a", "b"), label_size = 6, rel_widths = c(1,1.25))
+#pALL<-plot_grid(p2, p1, labels = c("a", "b"), label_size = 6, rel_widths = c(1,1.25))
+pALL<-plot_grid(p2, p1, rel_widths = c(1,1.25))
+
 
 ggsave(plot = pALL, width = 5, height = 2.5, units = "in",dpi = 300, filename = "./figs/S2_scatterplot.png")
