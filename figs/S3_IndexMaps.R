@@ -6,6 +6,7 @@ library(rasterVis)
 
 # map layers
 states <- getData('GADM', country='United States', level=1)
+USA<-getData('GADM', country='USA', level=0)
 
 #rasterOptions(tmpdir="/home/crimmins/RProjects/TopoWx/tmpFiles")
 rasterOptions(progress = 'text')
@@ -31,13 +32,16 @@ temp<-stack(mask(sdDiff50_450_0Res/sdGDD50_0Res,maskNA_0),
             mask(sdDiff250_50Res/sdGDD50Res,maskNA),
             mask(sdDiff450_250Res/sdGDD250Res,maskNA)
             )
+# CONUS mask
+temp<- mask(x = temp, mask = USA)
+
 # add together
-col.titles = c('Full Season (50GDD-450GDD, 0°C base temp)',
-               'Early Season (50GDD-250GDD, 0°C base temp)',
-               'Late Season (250GDD-450GDD, 0°C base temp)',
-               'Full Season (50GDD-450GDD, 10°C base temp)',
-               'Early Season (50GDD-250GDD, 10°C base temp)',
-               'Late Season (250GDD-450GDD, 10°C base temp)')
+col.titles = c('a. Full Season (50GDD-450GDD, 0°C base temp)',
+               'c. Early Season (50GDD-250GDD, 0°C base temp)',
+               'e. Late Season (250GDD-450GDD, 0°C base temp)',
+               'b. Full Season (50GDD-450GDD, 10°C base temp)',
+               'd. Early Season (50GDD-250GDD, 10°C base temp)',
+               'e. Late Season (250GDD-450GDD, 10°C base temp)')
 
 # custom color ramp https://stackoverflow.com/questions/47459083/levelplot-color-key-range-and-extremes
 #max(values(temp), na.rm = TRUE)
@@ -45,8 +49,8 @@ col.titles = c('Full Season (50GDD-450GDD, 0°C base temp)',
 
 index.at=c(min(values(temp), na.rm = TRUE),0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1,1.05,1.1, max(values(temp), na.rm = TRUE))
 my.brks=seq(0.1, 1.5, by=0.1) # needs to match num of index.at
-myColorkey <- list(at=my.brks, labels=list(at=my.brks, labels=c(0, 0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1,1.05,1.1, 10)), 
-                   space="bottom")
+myColorkey <- list(at=my.brks, labels=list(at=my.brks,cex=0.53,labels=c(0, 0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1,1.05,1.1, 10)), 
+                   space="bottom",width=0.8, height=0.5)
 reds = brewer.pal(5, "YlOrRd")
 greens = brewer.pal(4, "Greens")
 blues = brewer.pal(5, "Blues")
@@ -61,15 +65,21 @@ text2add<-c('a','c','e','b','d','f')
 
 #index.at <- seq(0, 6, 0.05)
 p0 <- levelplot(temp, par.settings = mapTheme, ylab=NULL, xlab=NULL, colorkey=myColorkey,
-                at=index.at, sub=list(label="             SD(Duration)/SD(T1)",cex=0.75), 
-                names.attr=col.titles, par.strip.text=list(cex=0.5), 
-                layout=c(3,2),  scales=list(alternating=3))+ #scales=list(draw=FALSE)
-  layer(panel.text(-120, 26, text2add[panel.number()],  cex=1))+
-  layer(sp.polygons(states))
+                at=index.at, sub=list(label="             SD(Duration)/SD(T1)",cex=0.6,font = 1), 
+                names.attr=col.titles, par.strip.text=list(cex=0.53), 
+                layout=c(3,2),  scales=list(alternating=3, cex=0.53))+ #scales=list(draw=FALSE)
+  #layer(panel.text(-120, 26, text2add[panel.number()],  cex=0.5))+
+  layer(sp.polygons(states))+
+  layer(sp.polygons(states, col = 'gray40', lwd=0.1))
 
-png("/home/crimmins/RProjects/TopoWx/figs/S3_IndexMap.png", width = 7, height = 5, units = "in", res = 300L)
+# png("/home/crimmins/RProjects/TopoWx/figs/S3_IndexMap.png", width = 7, height = 5, units = "in", res = 300L)
+# print(p0, newpage = FALSE)
+# dev.off()
+
+pdf("/home/crimmins/RProjects/TopoWx/figs/manuscript/Fig4_IndexMap.pdf", width = 7.48, height = 4.53, pointsize = 8)
 print(p0, newpage = FALSE)
 dev.off()
+
 
 
 # #alternate color ramp

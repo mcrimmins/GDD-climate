@@ -177,14 +177,14 @@ p<-ggplot(gddTSall, aes(value,as.factor(years), color=zValue)) +
   # low = "orangered4", mid="grey65", high = "green4"
   xlim(-10, 285)+
   xlab("Day of Year") + ylab("Year")+ 
-  theme_bw(base_size = 10, base_family = "Helvetica")+
+  theme_bw(base_size = 8, base_family = "Helvetica")+
   theme(legend.position="bottom",legend.direction="horizontal", legend.justification = "center",
-        legend.text=element_text(size=8),
-        legend.title=element_text(size=8),
+        legend.text=element_text(size=5),
+        legend.title=element_text(size=5),
         strip.background = element_blank(),
         strip.text.x = element_blank())+ # strip.text.y = element_blank()
         #legend.background = element_rect(colour = 'black', fill = 'white', linetype='solid'))+
-  guides(colour = guide_colourbar(title.position="top", title.hjust = 0.5))
+  guides(colour = guide_colourbar(title.position="top", title.hjust = 0.5, size=8))
 
 
 # p + geom_text(data=gdd50sd, aes(x=xpos, y=ypos, 
@@ -192,10 +192,10 @@ p<-ggplot(gddTSall, aes(value,as.factor(years), color=zValue)) +
 #            vjust=2, parse=FALSE)
 
 pALL<-p + geom_text(data=gdd50corr, aes(x=xpos, y=ypos, 
-                                  label=paste0("r= ", corrLabel)), color="black",  size=3,
+                                  label=paste0("r= ", corrLabel)), color="black",  size=2.5,
               vjust=2, parse=FALSE) +
           geom_text(data=gdd50corr, aes(x=letterX, y=letterY, 
-                                label=letter), color="black",  size=3,
+                                label=letter), color="black",  size=2.5,
             vjust=2, parse=FALSE)
 
 # ggsave(plot = pALL, width = 4, height = 5, units = "in",dpi = 300, filename = "./figs/fig3.png")
@@ -213,10 +213,10 @@ states <- map_data("state")
 
 # inset map:
 insetmap<-ggplot() + 
-  geom_polygon(data = states, aes(x = long, y = lat, group = group), fill="lightgrey", color="grey")  + # get the state border back on top
+  geom_polygon(data = states, aes(x = long, y = lat, group = group), fill="lightgrey", color="grey", size=0.2)  + # get the state border back on top
   coord_fixed(xlim=c(-100, -67), ylim=c(25, 50), ratio = 1.3) +
-  geom_point(data = point, aes(x = x, y = y), size=1, color='red')+
-  geom_text(data = point, aes(x = x, y = y, label=seq(1,j,1)),size=3, nudge_x = -2.5, nudge_y = 0, color='red')+
+  geom_point(data = point, aes(x = x, y = y), size=0.6, color='red')+
+  geom_text(data = point, aes(x = x, y = y, label=seq(1,j,1)),size=2, nudge_x = -2.5, nudge_y = 0, color='red')+
   theme_bw(base_size=5)
  
 #ylab("") +
@@ -228,10 +228,18 @@ insetmap<-ggplot() +
 #  draw_plot(insetmap, x = 0, y = 0, scale = 0.5)
 
 #A viewport taking up a fraction of the plot area
-vp <- viewport(width = 0.28, height = 0.28, x = 0.2, y = 0.11)
+#vp <- viewport(width = 0.28, height = 0.28, x = 0.2, y = 0.11)
+vp <- viewport(width = 0.2, height = 0.20, x = 0.17, y = 0.078)
 
-#Just draw the plot twice
-png("./figs/Fig3_barplots.png", width = 4, height = 5, units = "in", res = 300L)
+# #Just draw the plot twice
+# png("./figs/Fig3_barplots.png", width = 4, height = 5, units = "in", res = 300L)
+# print(pALL)
+# print(insetmap, vp = vp)
+# dev.off()
+
+# plot to other format
+pdf("/home/crimmins/RProjects/TopoWx/figs/manuscript/Fig5_barplots.pdf", width = 4.25, height = 5, pointsize = 8)
 print(pALL)
 print(insetmap, vp = vp)
 dev.off()
+
