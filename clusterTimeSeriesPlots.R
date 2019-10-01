@@ -61,7 +61,11 @@ rm(gdd50raw_x4,gdd250raw_x4,gdd450raw_x4)
 zStats<-as.data.frame(t(zonal(allGddraw, classMap, 'mean')))
 zStats<-zStats[-1,]
 zStats$yearLayer<-rownames(zStats)
-zStats<-zStats %>% gather(yearLayer, 1:clusterN)
+
+#zStats<-zStats %>% tidyr::gather(yearLayer, 1:clusterN)
+#zStats<-zStats %>% gather(zStats,-yearLayer)
+zStats<-zStats%>% gather("cluster","GDDValue",-yearLayer)
+
 colnames(zStats)<-c("code","cluster","GDDValue")
 zStats<-separate(zStats,code,c("X","code"), sep ="X")
 zStats<-separate(zStats,code,c("year","threshold"))
