@@ -82,17 +82,22 @@ rm(gdd50_x4,gdd250_x4,gdd450_x4)
 #load("./fixed/zscore50_450gddStats.RData")
 #allGdd<-stack(diff450_50,gdd50_x4)
 
-# load zProd grids
-load("./fixed/Prodzscore50_450gddStats.RData")
-# lat lon grids
- lonGrid <- normImage(init(prod450_50, 'x'),norm = TRUE)
- latGrid <- normImage(init(prod450_50, 'y'),norm = TRUE)
-#diff450_50<-stack(diff450_50,lonGrid,latGrid)
- # set names
- names(prod450_50)<-paste0(seq(1948, 2016, by=1),".PRODz50_450")
-allGdd<-stack(prod450_50,3*lonGrid,3*latGrid)
-rm(prod450_50)
+# load zProd grids for clustering
+# load("./fixed/Prodzscore50_450gddStats.RData")
+# # lat lon grids
+#  lonGrid <- normImage(init(prod450_50, 'x'),norm = TRUE)
+#  latGrid <- normImage(init(prod450_50, 'y'),norm = TRUE)
+# #diff450_50<-stack(diff450_50,lonGrid,latGrid)
+#  # set names
+#  names(prod450_50)<-paste0(seq(1948, 2016, by=1),".PRODz50_450")
+# allGdd<-stack(prod450_50,3*lonGrid,3*latGrid)
+# rm(prod450_50)
  
+# only adding lat/lon for geographic weighting
+# lat lon grids
+lonGrid <- normImage(init(prod450_50, 'x'),norm = TRUE)
+latGrid <- normImage(init(prod450_50, 'y'),norm = TRUE)
+
 # # # # find optimal cluster number
 # clusterN=20
 # wss<-allGdd[[1]]@nrows*allGdd[[1]]@ncols
@@ -136,7 +141,7 @@ rm(prod450_50)
 # cluster data
 ptm <- proc.time()
 set.seed(1234)
-  clusterN<-15
+  clusterN<-12
   unC <- unsuperClass(allGdd, nSamples = 250000, nClasses = clusterN, nStarts = 25, nIter = 1000, norm = FALSE) # or allGDD
 proc.time() - ptm
 
@@ -166,24 +171,24 @@ darkcols<-sample(col_vector, clusterN)
 classMap<-as.factor(unC$map)
 rat <- levels(classMap)[[1]]
 # cluster names
-rat[["cluster"]]<-c("TN Valley","N Plains","N Rockies","Pac NW","OH Valley","Florida",
-                    "Texas","S Plains","Gulf Coast","Northeast","Midwest","C Plains",
-                    "Southwest","S Rockies","Southeast")
+# rat[["cluster"]]<-c("TN Valley","N Plains","N Rockies","Pac NW","OH Valley","Florida",
+#                     "Texas","S Plains","Gulf Coast","Northeast","Midwest","C Plains",
+#                     "Southwest","S Rockies","Southeast")
 
-#rat[["cluster"]]<-c("N Plains","Gulf Coast","Ohio Valley","Upper Midwest","Southeast","Southwest",
+# rat[["cluster"]]<-c("N Plains","Gulf Coast","Ohio Valley","Upper Midwest","Southeast","Southwest",
 #                    "C Plains","S Plains","N Rockies","Pacific NW","S Rockies","Northeast")
 # rat[["cluster"]]<-c("S Rockies","N Rockies","Northeast","Pacific NW","S Plains",
 #                     "C Plains","N Plains","Southeast","Ohio Valley","Upper Midwest",
 #                     "Gulf Coast","Southwest")
-#                   
+
 #rat[["cluster"]] <- as.character(seq(1, clusterN, by=1))
 levels(classMap) <- rat 
 
 # plot classified map
 levelplot(classMap, col.regions=darkcols, par.settings=list(panel.background=list(col="white")),
-          margin=FALSE, main="50*450 GDD Product Z-score Anom clustering (3*lat/lon)")+
-  layer(sp.polygons(states))+
-  layer(sp.polygons(clusterpoly)) 
+          margin=FALSE, main="50/250/450 Anom clustering")+
+  layer(sp.polygons(states))
+#  layer(sp.polygons(clusterpoly)) 
 
 # save classMap
 #save(classMap, file="./fixed/cluster8classMap.RData")

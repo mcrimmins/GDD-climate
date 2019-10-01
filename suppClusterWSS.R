@@ -4,7 +4,8 @@
 library(cowplot)
 library(tidyr)
 
-load("./fixed/zProd_FindClusterDiagnostics.RData")
+load("./fixed/FindClusterDiagnostics.RData")
+#load("./fixed/zProd_FindClusterDiagnostics.RData")
 df<-as.data.frame(cbind(seq(1,20,by=1), wss,minwss,btwss,totss))
 colnames(df)[1]<-"cluster"
 df$diffWSS<-c(NA,diff(df$wss)*-1)
@@ -16,20 +17,27 @@ df<-df[2:20,]
 # filter
 #df <- df[which(df$cluster>=5 & df$cluster<=15),]
 
-df<-gather(df, key = "cluster")
-  colnames(df)[2]<-"var"
+df<-gather(df, 'wss','diffWSS','minwss','diffMinWSS',key = 'var',value='values')
+  #colnames(df)[2]<-"var"
   df$var<-factor(df$var, levels = c("wss","diffWSS","minwss","diffMinWSS"))
-  to_string <- as_labeller(c("wss" = "Within Cluster Sum of Squares", "diffWSS" ="Difference in Within Cluster Sum of Squares, k-1 to k",
-                             "minwss" = "Minimum Within Cluster Sum of Squares","diffMinWSS" = "Difference in Minimum Within Cluster Sum of Squares, k-1 to k"))
+  to_string <- as_labeller(c("wss" = " a.) Within Cluster Sum of Squares", "diffWSS" =" b.) Difference in Within Cluster Sum of Squares, k-1 to k",
+                             "minwss" = " c.) Minimum Within Cluster Sum of Squares","diffMinWSS" = " d.) Difference in Minimum Within Cluster Sum of Squares, k-1 to k"))
 
-ggplot(df, aes((cluster), value))+
+p<-ggplot(df, aes((cluster), values))+
   geom_line()+
-  geom_point(data=df, aes(x=(cluster),y=value))+
-  geom_vline(xintercept=15)+
+  geom_point(data=df, aes(x=(cluster),y=values))+
+  geom_vline(xintercept=12, linetype="dotted")+
   ylab("Squared Error")+
   xlab("Cluster (k)")+
   #xlim(10,15)+
-  facet_wrap(~var, nrow = 4, scales = "free",  labeller = to_string)
+  facet_wrap(~var, nrow = 4, scales = "free",  labeller = to_string)+
+  theme(strip.text.x = element_text(angle = 0, hjust = 0))
+
+# plot to png
+png("/home/crimmins/RProjects/TopoWx/clusterTrends/figs/SuppFig_WSS_screePlots.png", width = 7, height = 7, units = "in", res = 300L)
+#grid.newpage()
+print(p, newpage = FALSE)
+dev.off()
 
 
 # #  

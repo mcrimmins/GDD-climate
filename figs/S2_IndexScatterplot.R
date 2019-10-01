@@ -74,5 +74,7 @@ pALL<-plot_grid(p2, p1, rel_widths = c(1,1.25))
 
 #ggsave(plot = pALL, width = 5, height = 2.5, units = "in",dpi = 300, filename = "./figs/S2_scatterplot.png")
 
-ggsave(plot = pALL, width = 7.48, height = 4.53, units = "in",dpi = 300, filename = "./figs/manuscript/Fig3_scatterplot.pdf")
+#ggsave(plot = pALL, width = 7.48, height = 4.53, units = "in",dpi = 300, filename = "./figs/manuscript/Fig3_scatterplot.pdf")
+
+ggsave(plot = pALL, width = 7.48, height = 4.53, units = "in",dpi = 300, filename = "./figs/manuscript/Fig3_scatterplot.tiff")
 
